@@ -1,0 +1,5 @@
+M4R.sublime-project
+M4R.sublime-workspace
+
+*.pyc
+pdfs/
