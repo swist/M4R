@@ -48,20 +48,21 @@ def normal_form(vector_s, set_G, j):
     pprint(vector_s)
     print "G:"
     pprint(set_G)
-
+    s_now = vector_s
     while True:
-        normalizable = [g for g in set_G if check_vectors_square_leq(g, vector_s, j) is True]
+        normalizable = [g for g in set_G if check_vectors_square_leq(g, s_now, j) is True]
         print "normalizable"
         pprint(normalizable)
         if not normalizable:
+            vector_s = s_now
             break
         else:
             for vector_g in normalizable:
                 print "reducing s:"
-                alpha = compute_alpha(vector_s, vector_g, j)
+                alpha = compute_alpha(s_now, vector_g, j)
                 print "alpha"
                 print alpha
-                vector_s = vector_s - alpha* vector_g
+                s_now = s_now - alpha* vector_g
 
     return vector_s
 
@@ -125,9 +126,9 @@ def poittier(F, j):
 def ref(matrix):
     rows, cols = matrix.shape
     M = matrix.as_mutable()
-    BC = ones(cols)
     m = min(cols, rows)
     i, stopper = 0,0
+    BC = eye(max(rows, cols))
     while i < m  and stopper < cols:
         j = next((k for k in xrange(i, rows) if M[k,i] != 0), None)
         if j is not None:
@@ -140,14 +141,13 @@ def ref(matrix):
                     row_k = -b/L[2] * M[j,:] + a/L[2] * M[k,:]
                     M[j,:] = row_j
                     M[k,:] = row_k
-            if i != j:
-                M.row_swap(i, j)
             if M[i,i] < 0:
                 M.row_op(i, lambda x, _: -1*x)
         else:
             M.col_swap(i, cols-1)
-            BC.col_swap(i, cols-1)
             i = i - 1;
         i = i + 1 
         stopper = stopper + 1
-    return matrix._new(M)
+
+    # BC = matrix.T.solve(M.T)
+    return matrix._new(M), BC

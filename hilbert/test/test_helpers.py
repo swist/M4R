@@ -4,10 +4,11 @@ from ..basis_element import BasisElement
 
 def test_ref_2d():
     M = Matrix([[1,-2], [-2,1]])
-    result = Matrix([[1,-2], [0, 3]])
+    result, pivots = helpers.ref(M)
 
-    assert helpers.ref(M) == result
-    assert not M is result
+    assert result == Matrix([[1,-2], [0, 3]])
+    assert pivots == Matrix.eye(2)
+    
 
 def test_ref_3d():
     M_3= Matrix([
@@ -15,14 +16,14 @@ def test_ref_3d():
         [2, 3, 1, 1], 
         [3, 1, 2, 1]
     ])
-    result_3= Matrix([
+    result_3, pivots_3 = helpers.ref(M_3)
+
+    assert result_3 == Matrix([
         [1, 2, 3, 1], 
         [0, 1, 5, 1], 
         [0, 0, 18, 3]
     ])
-
-    assert helpers.ref(M_3) == result_3
-    assert not M_3 is result_3
+    assert pivots_3 == Matrix.eye(4)
 
 
 def test_leq_helpers():

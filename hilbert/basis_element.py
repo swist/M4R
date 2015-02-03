@@ -1,4 +1,4 @@
-from sympy import Matrix, pprint
+from sympy import Matrix, pprint, Integer
 import itertools
 class BasisElement(Matrix):
 	"""docstring for BasisElement"""
@@ -37,6 +37,7 @@ class BasisElement(Matrix):
 	def lift_single_choice(self, row_to_add):
 		print "self"
 		pprint(self)
+		row_to_add = row_to_add[:, -1]
 		print "linear factors"
 		print self.linear_factors
 		linear_factors_vector = Matrix([self.linear_factors])
@@ -53,16 +54,30 @@ class BasisElement(Matrix):
 
 	def lift_multiple_choice(self, row_to_add):
 		self.linear_factors.append(0)
-		linear_factors_vector = Matrix([self.linear_factors])
-		last_el = (linear_factors_vector * row_to_add)[-1]
+		# linear_factors = self.linear_factors
+		# last_el = 0
+		# pprint(row_to_add)
+		# while True:
+		# 	h = self.row_join(Matrix([last_el]))
+		# 	if (row_to_add.inv()*h.T).has(Integer):
+		# 		self = h
+		# 		break
+		# 	last_el = last_el + 1
 
+		linear_factors_vector = Matrix([self.linear_factors])
+		print "row to add"
+		pprint(row_to_add)
+		last_el = (linear_factors_vector * row_to_add)[-1]
+		while last_el < 0:
+			last_el = last_el + row_to_add[-1]
+			self.linear_factors[-1] = self.linear_factors[-1] +1
+		pprint(last_el)
 		if last_el >= row_to_add[-1]:
 			self.linear_factors[-1] = -1 * (last_el/row_to_add[-1])
 			last_el = last_el % row_to_add[-1]
-		else:
-			self.linear_factors[-1] = 1
-			last_el = last_el + row_to_add[-1]
 		
+		print "last_el"
+		pprint(last_el)
 		#crazy mutation stuff ahppening here
 		linear_factors = self.linear_factors
 		self = self.row_join(Matrix([last_el]))

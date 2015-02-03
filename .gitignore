@@ -3,3 +3,14 @@ M4R.sublime-workspace
 
 *.pyc
 pdfs/
+notepad.py
+writeup/mathsymbols.log
+
+macaulay.sublime-project
+macaulay.sublime-workspace
+writeup/writeup.aux
+writeup/writeup.log
+writeup/writeup.pdf
+writeup/writeup.toc
+writeup/thesis.preamble.aux
+writeup/mathsymbols.sty

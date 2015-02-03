@@ -7,28 +7,29 @@ from .basis_element import BasisElement
 def construct_hilbert_basis(matrix):
     #input - sympy matrix in row echelon form
     #pick first generator
-    if matrix.rows < matrix.cols:
-        matrix = matrix.T
-
-    A = ref(matrix);
+    
+    A, BC= ref(matrix);
+    A = ref(A.T)[]
     h_1 = BasisElement(Matrix([A[0,0]]))
     H = [h_1]
     s, n = A.shape
-
+    print "A, BC"
+    pprint(A)
+    pprint(BC)
 
     for j in xrange(1, n):
         # print 'H'
         # pprint(H)
         F = []
         #project to first j+1 coordinates
-        K_j_1 = A[:j+1, j]
+        K_j_1 = A[:j+1, :j+1]
         print "H_%d to be lifted:" %j
         pprint(H)
         print "\n"
 
         if j < s:
             for h in H:
-                F.append(h.lift_multiple_choice(K_j_1))
+                F.append(h.lift_multiple_choice(A[:j+1,:j+1]))
 
             F.append(BasisElement(A[j,:j+1]))
             F.append(BasisElement(-1*A[j,:j+1]))
@@ -45,4 +46,5 @@ def construct_hilbert_basis(matrix):
         print "H_%d:" % (j+1)
         pprint(H)
         print "\n"
+        
     return H

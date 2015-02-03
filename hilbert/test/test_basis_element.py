@@ -65,13 +65,20 @@ def test_scalar_multiplication():
 def test_lift_multiple_choice():
     h = BasisElement([refed_matrix[0,0]])
 
-    h = h.lift_multiple_choice(refed_matrix[:2,1])
+    h = h.lift_multiple_choice(refed_matrix[:2,:2])
     assert h.cols == 2
     assert h[0,-1] == 0
-    assert h.linear_factors[-1] == -2
+    assert h.linear_factors[-1] == 0
 
-    h = h.lift_multiple_choice(refed_matrix[:3,2])
+    h = h.lift_multiple_choice(refed_matrix[:3,:3])
 
     assert h.cols == 3
-    assert h[0,-1] == 9210
-    assert h.linear_factors[-1] == 1
+    assert h[0,-1] == 0
+    assert h.linear_factors[-1] == 0
+
+    h = BasisElement([[1]])
+    h = h.lift_multiple_choice(Matrix([[0],[1]]))
+
+    assert h.cols == 2
+    assert h[0,-1] == 0
+    assert h.linear_factors[-1] == 0
