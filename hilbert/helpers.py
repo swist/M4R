@@ -2,45 +2,8 @@ import numpy as np
 import math
 import itertools
 from sympy import *
-from .basis_element import BasisElement
+from .vector_types import BasisElement, ExtremeRay
 init_printing(use_unicode=True)
-
-def compare_first_j_elements(u, v, j):
-    #this can be parallelised
-    return all([u_i <= v_i for u_i, v_i in itertools.izip(u[:j], v[:j])])
-
-def compare_norms_of_jth_element(u, v, j):
-    return abs(u[j]) <= abs(v[j])
-
-def check_product_of_jth_elements_positive(u, v, j):
-    return u[j]*v[j] >= 0
-
-def check_vectors_square_leq(u, v, j):
-    print "check_vectors_square_leq:"
-    print "u:"
-    pprint(u)
-    print "v"
-    pprint(v)
-    print "j:"
-    pprint(j)
-
-    # these can be parallelised perhaps (run them asynchronously)
-    return all([
-        compare_first_j_elements(u, v, j),
-        compare_norms_of_jth_element(u,v, j),
-        check_product_of_jth_elements_positive(u, v, j)
-        ])
-
-def compute_alpha(vector_s, vector_g, j):
-    print "compute_alpha:"
-    print "s:"
-    pprint(vector_s)
-    print "v"
-    pprint(vector_g)
-    print "j:"
-    pprint(j)
-
-    return min([floor(s_i/g_i) for s_i, g_i in zip(vector_s[:j+2], vector_g[:j+2]) if g_i != 0])
 
 def normal_form(vector_s, set_G, j):
     print "computing normal form from:"
@@ -50,38 +13,37 @@ def normal_form(vector_s, set_G, j):
     pprint(set_G)
     s_now = vector_s
     while True:
-        normalizable = [g for g in set_G if check_vectors_square_leq(g, s_now, j) is True]
+        if any([g == s_now for g in set_G]):
+            return s_now - s_now
+
+        normalizable = [g for g in set_G if (g<=s_now)]
         print "normalizable"
         pprint(normalizable)
+        pprint(s_now)
         if not normalizable:
             vector_s = s_now
             break
         else:
-            for vector_g in normalizable:
-                print "reducing s:"
-                alpha = compute_alpha(s_now, vector_g, j)
-                print "alpha"
-                print alpha
-                s_now = s_now - alpha* vector_g
+            vector_g = normalizable[0]
+            print "reducing s:"
+            alpha = s_now.compute_alpha(vector_g)
+            # alpha = min([s_i/g_i for s_i, g_i in zip(s_now[:j+2], vector_g[:j+2]) if g_i != 0])
+            print "alpha"
+            print alpha
+            s_now = s_now - alpha* vector_g
 
     return vector_s
-
-def compute_s_vectors(vec_1, vec_2):
-    if vec_1[-1]*vec_2[-1] < 0:
-        return vec_1 + vec_2
-    else:
-        return None
-
 
 def construct_c(G):
     C = []
     print "constructing C:\n"
     # use itertools product instead of zip for better performance
-    for vector_f, vector_g in itertools.product(G, G):
-        s_vector = compute_s_vectors(vector_f, vector_g)
-        # only add if we don't have a vector that is equal
-        if s_vector and not s_vector.is_zero and all((s_vector != c for c in C)):
-            C.append(s_vector)
+    for f, g in itertools.product(G, G):
+        s = f.compute_s_vector(g)
+        
+        # only add if well don't have a vector that is equal
+        if s and not s.is_zero and all((s != c for c in C)):
+            C.append(s)
     print "C is:\n"
     pprint(C)
     return C
@@ -89,7 +51,7 @@ def construct_c(G):
 def extend_c(f,C,G):
     print "f not zero, extending C and G:\n"
     for g in G:
-        vec = compute_s_vectors(f,g)
+        vec = f.compute_s_vector(g)
         print "computed s-vector:"
         pprint(vec)
         if vec and all((vec != c for c in C)):
@@ -105,6 +67,7 @@ def poittier(F, j):
     C = construct_c(G)
     print "reduction loop:"
     while len(C):
+        
         print "C is:"
         pprint(C)
         print "G is:"
@@ -121,7 +84,7 @@ def poittier(F, j):
             extend_c(f,C,G)
         print "end of iteration \n"
     # return H^+
-    return [g for g in G if g[-1] >= 0]
+    return [g for g in G if g[-1] >=0]
 
 def ref(matrix):
     rows, cols = matrix.shape

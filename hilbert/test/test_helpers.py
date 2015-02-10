@@ -1,12 +1,12 @@
-from sympy import Matrix
+from sympy import Matrix, pprint
 from .. import helpers
-from ..basis_element import BasisElement
+from ..vector_types import BasisElement
 
 def test_ref_2d():
-    M = Matrix([[1,-2], [-2,1]])
+    M = Matrix([[1,2], [2,1]])
     result, pivots = helpers.ref(M)
 
-    assert result == Matrix([[1,-2], [0, 3]])
+    assert result == Matrix([[1,2], [0, 3]])
     assert pivots == Matrix.eye(2)
     
 
@@ -26,15 +26,6 @@ def test_ref_3d():
     assert pivots_3 == Matrix.eye(4)
 
 
-def test_leq_helpers():
-    V_1 = Matrix([0,1,3]).T
-    V_2 = Matrix([0,2,0]).T
-
-    assert helpers.compare_first_j_elements(V_1, V_2, 2) == True
-    assert helpers.check_product_of_jth_elements_positive(V_1, V_2, 2) == True
-
-    V_2 = Matrix([1,0,3]).T
-    assert helpers.compare_first_j_elements(V_1, V_2, 2) == False
 
 
 def test_construct_C():
@@ -109,6 +100,29 @@ def test_poittier():
     ]
 
     H2 = helpers.poittier(F,1)
+    assert H2 == result
+
+
+def test_poittier():
+    F = [
+        BasisElement([[1,0]]),
+        BasisElement([[0,5]]),
+        BasisElement([[0,-5]])
+    ]
+
+    result = [
+        BasisElement([[1,13]]),
+        BasisElement([[0,18]]),
+        BasisElement([[2,8]]),
+        BasisElement([[3,3]]),
+        BasisElement([[7,1]]),
+        BasisElement([[18,0]])
+    ]
+
+
+    H2 = helpers.poittier(F,1)
+
+    pprint(H2)
     assert H2 == result
 
 
