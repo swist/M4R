@@ -79,7 +79,7 @@ class LiftableVector(Matrix):
         while last_el < 0:
             last_el = last_el + row_to_add[-1]
             self.linear_factors[-1] = self.linear_factors[-1] + 1
-        pprint(last_el)
+        print("lastel %d" % last_el)
         if last_el >= row_to_add[-1]:
             pprint("last >= row")
             self.linear_factors[-1] = -1 * (last_el/row_to_add[-1])

@@ -1,8 +1,7 @@
-import numpy as np
-import math
-from sympy import *
-from .helpers import ref, poittier
-from .vector_types import BasisElement, ExtremeRay
+from sympy import pprint, Matrix
+from hilbert.helpers import poittier, ref
+from hilbert.hnf import hnf_row
+from hilbert.vector_types import BasisElement
 
 
 def construct_hilbert_basis(matrix, VectorClass=BasisElement):
@@ -18,7 +17,7 @@ def construct_hilbert_basis(matrix, VectorClass=BasisElement):
     pprint(A)
     # pprint(BC)
 
-    for j in xrange(1, n):
+    for j in range(1, n):
         # print 'H'
         # pprint(H)
         F = []
