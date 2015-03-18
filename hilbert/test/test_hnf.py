@@ -26,36 +26,43 @@ def test_hnf_col():
     assert B.is_lower
 
     A = Matrix([
-        [0, 1, 0],
-        [2, -1, 0]
+        [0, 1],
+        [2, -1]
         ])
     B, pivots = hnf_col(A)
     assert B.is_lower
-    assert B == Matrix([[1, 0], [0, 2]])
+    assert B == Matrix([
+        [1, 0],
+        [-1, 2]
+    ])
 
 
-# def test_hnf_row():
-#     A = Matrix([
-#         [3, 3, 1, 4],
-#         [0, 1, 0, 0],
-#         [0, 0, 19, 6],
-#         [0, 0, 0, 3]
-#     ])
-#     B, pivots = hnf_row(A)
-#     print(B.C)
+def test_hnf_row():
+    A = Matrix([
+        [2, 0],
+        [0, 1]
+    ])
+    B, pivots = hnf_row(A)
 
-#     assert B.is_upper
-#     assert B == Matrix([
-#         [3, 0, 1, 1],
-#         [0, 1, 0, 0],
-#         [0, 0, 19, 1],
-#         [0, 0, 0, 3]
-#     ])
+    assert B.is_upper
+    assert B == A
 
-#     assert B.is_upper
+    A1 = Matrix([
+        [2, -1],
+        [0, 1]
+    ])
+    B, pivots = hnf_row(A1)
+    assert B.is_upper
+    assert B == A1
 
-#     A = Matrix([
-#         [0, 1],
-#         [2, -1]
-#         ])
-#     B, pivots = hnf_row(A)
+
+    A = Matrix([[1, 2, 123], [13, 2, 132]])
+    B, pivots = hnf_row(A)
+    pprint(B)
+    assert B == Matrix([[1, 2, 123], [0, 24, 1467]])
+
+
+    A = Matrix([[2, 0, -1], [1, 3, 2], [1, 4, 8]])
+    B, pivots = hnf_row(A)
+    
+    assert B == Matrix([[1, 4, 8], [0, 1, 6], [0, 0, 31]])

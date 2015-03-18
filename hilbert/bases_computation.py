@@ -1,30 +1,28 @@
 from sympy import pprint, Matrix
-from hilbert.helpers import poittier, ref
+from hilbert.helpers import poittier
 from hilbert.hnf import hnf_row
 from hilbert.vector_types import BasisElement
 
 
-def construct_hilbert_basis(matrix, VectorClass=BasisElement):
-    # input - sympy matrix in row echelon form
-    # pick first generator
-    pprint(VectorClass)
-    A, BC = ref(matrix)
+def construct_generating_set(A, VectorClass=BasisElement):
+    # input - sympy cone in row echelon form
+    # pick first generator    
     # A = matrix
     h_1 = VectorClass(Matrix([A[0, 0]]))
     H = [h_1]
     s, n = A.shape
-    print("A, BC")
+    print("A")
     pprint(A)
     # pprint(BC)
 
     for j in range(1, n):
-        # print 'H'
-        # pprint(H)
+        
+        # pick H^+
+        H = [h for h in H if h[-1] >= 0]
+
         F = []
         # project to first j+1 coordinates
-        K_j_1 = A[:j+1, j]
-        print("H_%d to be lifted:" % j)
-        pprint(H)
+        K_j_1 = A[:j+1, :j + 1]
 
         if j < s:
             for h in H:
@@ -37,10 +35,6 @@ def construct_hilbert_basis(matrix, VectorClass=BasisElement):
             for h in H:
                 F.append(h.lift_single_choice(K_j_1))
 
-        print("F after lifting:")
-        pprint(F)
-
         H = poittier(F, j)
-        print("H_%d:" % (j+1))
-        pprint(H)
+
     return H

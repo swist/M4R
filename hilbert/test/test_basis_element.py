@@ -25,52 +25,6 @@ def test_basis_leq():
     assert not (g[:3] <= s[:3])
 
 
-def test_ray_leq():
-    g = ExtremeRay([[1, 0]])
-    s = ExtremeRay([[1, 13]])
-
-    assert g[:2] <= s[:2]
-
-    g = ExtremeRay([[1, 0]])
-    assert g[:2] <= s[:2]
-
-    g = ExtremeRay([[0, 1, 13]])
-    s = ExtremeRay([[1, 0, 3]])
-    assert not (g[:3] <= s[:3])
-
-    g = ExtremeRay([[1, 0, 0]])
-    assert g[:3] <= s[:3]
-
-
-def test_ray_support():
-    v = ExtremeRay([[1, 2, 3]])
-    assert v.support() == {0, 1, 2}
-
-    v = ExtremeRay([[0, 1, -1]])
-    assert v.support() == {1, 2}
-
-
-def test_ray_s_vector():
-    v = ExtremeRay([[0, -5]])
-    w = ExtremeRay([[1, 2]])
-
-    s = v.compute_s_vector(w)
-    # always 0 in the last place
-    assert s[-1] == 0
-
-
-def test_ray_alpha():
-    g = ExtremeRay([[1, 5, 132]])
-    s = ExtremeRay([[1, 3, 13]])
-
-    assert s.compute_alpha(g) == Rational(3, 5)
-
-    s = ExtremeRay([[1, 0]])
-    g = ExtremeRay([[Rational(5, 2), 1]])
-
-    assert s.compute_alpha(g) == Rational(2, 5)
-
-
 def test_constructor():
     h = BasisElement([refed_matrix[0, 0]])
     assert h.cols == 1

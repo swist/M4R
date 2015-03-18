@@ -45,25 +45,9 @@ class LiftableVector(Matrix):
         z.linear_factors = [other * x for x in self.linear_factors]
         return z
 
-    def support(self):
-        support = set()
-        for index, el in enumerate(self):
-            if el != 0:
-                support.add(index)
-        return support
-
     def lift_single_choice(self, row_to_add):
-        print("self")
-        pprint(self)
         row_to_add = row_to_add[:, -1]
-        print("linear factors")
-        print(self.linear_factors)
         linear_factors_vector = Matrix([self.linear_factors])
-        print("row to add")
-        pprint(row_to_add)
-        print("linear factos vec")
-        pprint(linear_factors_vector)
-
         last_el = (linear_factors_vector * row_to_add)[-1]
         linear_factors = self.linear_factors
         self = self.row_join(Matrix([last_el]))
@@ -73,20 +57,16 @@ class LiftableVector(Matrix):
     def lift_multiple_choice(self, row_to_add):
         self.linear_factors.append(0)
         linear_factors_vector = Matrix([self.linear_factors])
-        print("row to add")
-        pprint(row_to_add)
+
         last_el = (linear_factors_vector * row_to_add)[-1]
         while last_el < 0:
             last_el = last_el + row_to_add[-1]
             self.linear_factors[-1] = self.linear_factors[-1] + 1
-        print("lastel %d" % last_el)
+
         if last_el >= row_to_add[-1]:
-            pprint("last >= row")
+
             self.linear_factors[-1] = -1 * (last_el/row_to_add[-1])
             last_el = last_el % row_to_add[-1]
-
-        print("last_el")
-        pprint(last_el)
         # crazy mutation stuff ahppening here
         linear_factors = self.linear_factors
         self = self.row_join(Matrix([last_el]))
@@ -120,6 +100,9 @@ class BasisElement(LiftableVector):
                 in zip(self[:], vector_g[:]) if g_i != 0]
         )
 
+    def norm(self):
+        return sum(self.values())
+
 
 class ExtremeRay(LiftableVector):
     """docstring for ExtremeRay"""
@@ -127,13 +110,15 @@ class ExtremeRay(LiftableVector):
         super(ExtremeRay, self).__init__(*args, **kwargs)
 
     def __le__(self, other):
-        supp_1 = self.support()
-        supp_2 = other.support()
-        print("lhs support")
-        print(supp_1)
-        print("rhs support")
-        print(supp_2)
-        return supp_1.issubset(supp_2)
+        return self.support <= other.support
+
+    @property
+    def support(self):
+        support = set()
+        for index, el in enumerate(self):
+            if el != 0:
+                support.add(index)
+        return support
 
     def compute_s_vector(self, other):
         if self[-1]*other[-1] < 0:
@@ -142,13 +127,34 @@ class ExtremeRay(LiftableVector):
         else:
             return
 
+    def lift(self, Cone):
+        v = self.row_join(ExtremeRay([[0]]))
+        i = 0
+        while not Cone.contains(v.T):
+            i = i + 1
+            v = self.row_join(ExtremeRay([[i]]))
+        return v
+
     def compute_alpha(self, vector_g):
-        pprint(self)
-        pprint(vector_g)
-        self_copy = self[:-1]
-        g_copy = vector_g[:-1]
-        pprint(self_copy)
-        pprint(g_copy)
-        return min([
+        alpha = min([
             s_i/g_i for s_i, g_i in
-            zip(self_copy[:], g_copy[:]) if g_i != 0])
+            zip(self[0:-1], vector_g[0:-1]) if g_i != 0])
+        assert alpha != 0
+        return alpha
+
+    def normal_form(self, set_G):
+        s_now = self
+        while True:
+            if any([g == s_now for g in set_G]):
+                return s_now - s_now
+
+            normalizable = [g for g in set_G if (g <= s_now)]
+
+            if not normalizable:
+                break
+            else:
+                vector_g = normalizable[0]
+                alpha = s_now.compute_alpha(vector_g)
+                s_now = s_now - alpha * vector_g
+
+        return s_now
