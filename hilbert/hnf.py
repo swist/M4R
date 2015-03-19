@@ -24,12 +24,13 @@ def row_one_gcd(A, i, j, l):
 
         A[:, j] = s[:, 0]
         A[:, l] = s[:, 1]
+
     return A
 
 
 def hnf_col(A):
-    A = A.as_mutable()
-    i = [0 for i in range(A.cols)]
+    m, n = A.shape
+    A = A.as_mutable().col_join(Matrix.eye(A.cols))
     t = 0
     while t < A.cols:
         r = -1
@@ -37,8 +38,6 @@ def hnf_col(A):
         while s < A.rows:
             if A[s, r + 1] != 0 or A[s, t] != 0:
                 r = r + 1
-                i[r - 1] = s
-
                 if t == r:
 
                     if A[s, t] < 0:
@@ -52,7 +51,10 @@ def hnf_col(A):
                     break
             s = s + 1
         t = t + 1
-    return A, i
+
+    B = A.extract(range(m), range(n))
+    BC = A.extract(range(m, A.rows), range(n))
+    return B, BC
 
 
 def col_one_gcd(A, i, j, l):
@@ -70,7 +72,6 @@ def col_one_gcd(A, i, j, l):
         # pprint(s)
         A[j, :] = s[0, :]
         A[l, :] = s[1, :]
-        pprint(A)
     return A
 
 
@@ -105,4 +106,4 @@ def hnf_row(A):
     # return A, i
     B, BC = hnf_col(A.T)
 
-    return B.T, BC
+    return B.T, BC.T
