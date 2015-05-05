@@ -59,11 +59,3 @@ def test_normal_form():
 
     res = s.normal_form(G)
     assert res == s
-
-
-def test_lift():
-    s = ExtremeRay([[1]])
-    m = Cone([[1, 2], [0, 3]])
-
-    lift = s.lift(m)
-    assert(lift == ExtremeRay([[1, 2]]))

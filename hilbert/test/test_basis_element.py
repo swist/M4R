@@ -1,4 +1,4 @@
-from ..vector_types import BasisElement, ExtremeRay
+from ..vector_types import BasisElement, LiftableVector
 from sympy import Matrix, Rational
 
 refed_matrix = Matrix([
@@ -81,6 +81,34 @@ def test_scalar_multiplication():
     assert z.linear_factors[0] == 3 * h.linear_factors[0]
     assert z.linear_factors[1] == 3 * h.linear_factors[1]
     assert len(z.linear_factors) == len(h.linear_factors)
+
+
+def test_lift():
+    s = LiftableVector([1])
+    m = Matrix([[1, 2], [0, 3]])
+    result = LiftableVector([1, 0])
+
+    lift = s.lift_single_choice(m)
+    assert lift == result
+
+    M = Matrix([[1,0,0],[5,2,0],[-11,11,7]])
+    H = [
+        LiftableVector([1, 1]),
+        LiftableVector([0, 2]),
+        LiftableVector([2, 0]),
+    ]
+
+    res = [
+        LiftableVector([1, 1, 2]),
+        LiftableVector([0, 2, 4]),
+        LiftableVector([2, 0, 0]),
+    ]
+
+    lifted = [h.lift_single_choice(M) for h in H]
+    assert res == lifted
+
+
+
 
 
 def test_lift_multiple_choice():

@@ -45,14 +45,17 @@ class LiftableVector(Matrix):
         z.linear_factors = [other * x for x in self.linear_factors]
         return z
 
-    def lift_single_choice(self, row_to_add):
-        row_to_add = row_to_add[:, -1]
-        linear_factors_vector = Matrix([self.linear_factors])
-        last_el = (linear_factors_vector * row_to_add)[-1]
-        linear_factors = self.linear_factors
-        self = self.row_join(Matrix([last_el]))
-        self.linear_factors = linear_factors
-        return self
+    def lift_single_choice(self, M):
+        i = 0
+        h = self.col_join(Matrix([0]))
+        while True:
+            h[-1] = i
+            echelon_form = M.row_join(h).rref()[0]
+            coeffs = echelon_form[:,-1].values()
+            if all(val.is_integer for val in coeffs):
+                return h
+            i = i + 1
+
 
     def lift_multiple_choice(self, row_to_add):
         self.linear_factors.append(0)
@@ -127,13 +130,8 @@ class ExtremeRay(LiftableVector):
         else:
             return
 
-    def lift(self, Cone):
-        v = self.row_join(ExtremeRay([[0]]))
-        i = 0
-        while not Cone.contains(v.T):
-            i = i + 1
-            v = self.row_join(ExtremeRay([[i]]))
-        return v
+    def lift(self, A):
+        return self.lift_single_choice(A)
 
     def compute_alpha(self, vector_g):
         alpha = min([
