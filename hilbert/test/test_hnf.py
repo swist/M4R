@@ -64,20 +64,3 @@ def test_hnf_row():
     B, pivots = hnf_row(A)
 
     assert B == Matrix([[1, 4, 8], [0, 1, 6], [0, 0, 31]])
-
-
-def test_reverse_transform():
-    A = randMatrix(5, 3, -1, 3)
-    B, BC = hnf_col(A)
-
-    prod = A * BC
-    assert B.is_lower
-    assert prod == B
-
-    A = randMatrix(3, 5, -1, 3)
-    B, BC = hnf_row(A)
-    prod = BC.inv() * B
-
-    assert B.is_upper
-    assert prod == A
-    assert False

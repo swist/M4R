@@ -57,23 +57,3 @@ def test_normal_form():
 
     result = helpers.normal_form(s, G, 1)
     assert f == result
-
-
-def test_poittier():
-    F = [
-        BasisElement([[1, 13]]),
-        BasisElement([[0, 18]]),
-        BasisElement([[0, -18]])
-    ]
-
-    result = [
-        BasisElement([[1, 13]]),
-        BasisElement([[0, 18]]),
-        BasisElement([[2, 8]]),
-        BasisElement([[3, 3]]),
-        BasisElement([[7, 1]]),
-        BasisElement([[18, 0]])
-    ]
-
-    H2 = helpers.poittier(F, 1)
-    assert H2 == result

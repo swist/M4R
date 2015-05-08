@@ -14,7 +14,7 @@ def construct_generating_set(A, VectorClass=BasisElement):
     print("A")
     pprint(A)
     # pprint(BC)
-
+    
     for j in range(1, n):
         
         # pick H^+
@@ -22,19 +22,16 @@ def construct_generating_set(A, VectorClass=BasisElement):
 
         F = []
         # project to first j+1 coordinates
-        K_j_1 = A[:j+1, :j + 1]
-
+        K = A.T[:j+1, :j+1]
         if j < s:
             for h in H:
-                F.append(h.lift_multiple_choice(K_j_1))
+                F.append(h.lift(K))
 
-            F.append(VectorClass(A[j, :j+1]))
-            F.append(VectorClass(-1*A[j, :j+1]))
+            F.append(VectorClass(K[:,-1]))
+            F.append(VectorClass(-1*K[:,-1]))
         else:
-            # print "j>=s \n"
             for h in H:
-                F.append(h.lift_single_choice(K_j_1))
-
+                F.append(h.lift(K))
         H = poittier(F, j)
 
     return H
