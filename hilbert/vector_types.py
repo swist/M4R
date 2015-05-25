@@ -4,37 +4,9 @@ import itertools
 
 class LiftableVector(Matrix):
     """docstring for LiftableVector"""
-    linear_factors = []
 
     def __init__(self, *args, **kwargs):
         super(LiftableVector, self).__init__(*args, **kwargs)
-
-    def __add__(self, other):
-        z = super(LiftableVector, self).__add__(other)
-        z.linear_factors = [x + y for x, y in itertools.izip(
-            self.linear_factors,
-            other.linear_factors
-        )]
-        return z
-
-    def __sub__(self, other):
-        z = super(LiftableVector, self).__sub__(other)
-        z.linear_factors = [x - y for x, y in itertools.izip(
-            self.linear_factors,
-            other.linear_factors
-        )]
-        return z
-
-    def __mul__(self, other):
-        # if multiplying by a matrix, do whatever the superclass does
-        # should not be needed
-        if getattr(other, 'is_Matrix', False):
-            return super(LiftableVector, self).__mul__(other)
-
-        # otherwise multiply the linear factors as well
-        z = super(LiftableVector, self).__mul__(other)
-        z.linear_factors = [other * x for x in self.linear_factors]
-        return z
 
     def __getitem__(self, key):
         from_super_class = super(LiftableVector, self).__getitem__(key)

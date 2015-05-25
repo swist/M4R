@@ -37,7 +37,7 @@ def test_generators_in_hnf():
 def test_hb_from_dual2D():
     # symmetric 2D cone
     dual_in = Matrix([
-        [2,-1],
+        [2, -1],
         [-1, 2]
     ])
 
@@ -166,6 +166,7 @@ def test_hilbert_basis_3d3():
     ]
     assert len(res_exp) == len(res_bas)
     assert set(map(tuple, res_exp)) == set(map(tuple,res_bas))
+    assert False
 
 
 def test_rank_gt_1():
@@ -196,14 +197,26 @@ def test_rank_gt_1():
 
 @pytest.mark.broken
 def test_dual():
-    C = Cone([
-        [2, 1], 
-        [7, -1]
-    ])
+    C = Cone([[1,2],[2,1]])
+    dual = C._compute_dual()    
+    dual_rays = [
+        ExtremeRay([2,-1]),
+        ExtremeRay([-1,2]),
+    ]
+    assert set(map(tuple, dual)) == set(map(tuple, dual_rays))
+
+    C = Cone([[1, 1], [2, -3]])
+    dual = C._compute_dual()
+    pprint(dual)
+    dual_rays = [
+        ExtremeRay([2,-1]),
+        ExtremeRay([3,1]),
+    ]
+    assert set(map(tuple, dual)) == set(map(tuple, dual_rays))
 
     M = Matrix([
         [1, 1, 0],
-        [0, 3, 0],
+        [0, 1, 0],
         [0, 0, 1],
         [2, -5, 11]
     ]).T
@@ -214,8 +227,9 @@ def test_dual():
     pprint(dual)
     dual_rays = [
         ExtremeRay([1, 0, 0]),
-        ExtremeRay([-1, 1, 0]),
-        ExtremeRay([0, 0, 1])
+        ExtremeRay([0, 0, 1]),
+        ExtremeRay([-11, 11, 7]),
+        ExtremeRay([5, 2, 0])
     ]
     assert set(map(tuple, dual)) == set(map(tuple, dual_rays))
 
@@ -232,7 +246,39 @@ def test_dual():
     ]
     print('dual')
     pprint(dual)
-    assert set(map(tuple, dual.rays)) == set(map(tuple, dual_rays))
+    assert set(map(tuple, dual)) == set(map(tuple, dual_rays))
+
+@pytest.mark.broken
+def test_dual_big():
+    C = Cone(Matrix([
+        [0, 0, 0, 0, 0, 3, -4, -1, 2],
+        [0, 0, 0, 0, 1, -1, 1, 0, -1],
+        [0, 0, 0, 1, 2, 0, 0, -1, -2],
+        [0, 0, 1, 0, 1, 0, 0, -1, -1],
+        [0, 1, 2, 0, 0, 0, 0, -1, -2],
+        [1, 0, 2, 0, 0, 0, 0, -2, -1],
+        [-2, 0, -2, 0, 0, 0, 0, 3, 0],
+        [-2, 0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, -2, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, -1, 0]
+    ]).T)
+    
+    dual = C._compute_dual()
+    
+    dual_rays = [
+        ExtremeRay([0, -2,  0,  0, -1, -2, -2,  0, -1]),
+        ExtremeRay([0,  1,  0,  0,  0,  0,  0,  0,  0]),
+        ExtremeRay([0,  0,  0, -2,  1,  4,  3,  0,  0]),
+        ExtremeRay([0,  0,  0,  1,  0,  0,  0,  0,  0]),
+        ExtremeRay([0,  0,  0,  0,  0, -4, -3,  0,  0]),
+        ExtremeRay([0,  0,  0,  0,  0, -1, -1,  0,  0]),
+        ExtremeRay([-1,  0, -2, -2, -1,  0,  0, -2, -1]),
+        ExtremeRay([-2,  0, -1,  0, -1, -2, -1, -2,  0]),
+        ExtremeRay([-1, -2,  0,  0, -1, -2, -2,  0, -1]),
+        ExtremeRay([0, -2, -1, -2, -1,  0, -1,  0, -2])
+    ]
+    assert set(map(tuple, dual)) == set(map(tuple, dual_rays))
+
 
 
 

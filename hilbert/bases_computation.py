@@ -33,5 +33,6 @@ def construct_generating_set(A, VectorClass=BasisElement):
             for h in H:
                 F.append(h.lift(K))
         H = poittier(F, j)
+        pprint(H)
 
     return H

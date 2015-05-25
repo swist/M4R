@@ -19,7 +19,9 @@ def convert_to_ZZ(vector):
         if(vector[i].is_Rational):
             vector = vector[i].q * vector
     # make sure 1 in the first position
-    return vector * abs(vector[0])/vector[0]
+    if vector[0] < 0:
+        vector = vector * abs(vector[0])/vector[0]
+    return vector
 
 
 class Cone(ImmutableMatrix):
@@ -47,10 +49,21 @@ class Cone(ImmutableMatrix):
 
     def _compute_dual(self):
         if self._dual is None:
-            pprint(self)
-            dual_rays = fourierMotzkin(self)
-            pprint(dual_rays)
-            self._dual = Cone(dual_rays.T)
+            # pprint(self)
+            # dual_rays = fourierMotzkin(self)
+
+            A, BC = hnf_row(self)
+            pprint(A)
+            pprint(BC)
+            if self.rows is 2:
+                dr = A.inv() * BC.inv()
+                self._dual = map(convert_to_ZZ, [dr.row(i) for i in range(dr.rows)])
+            else:
+                dual_rays = construct_generating_set(A, ExtremeRay)
+                dual_rays = preimage(self.T, dual_rays, ExtremeRay)
+                pprint(dual_rays)
+                self._dual = dual_rays
+
 
         return self._dual
 
