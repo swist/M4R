@@ -1,38 +1,61 @@
 from sympy import pprint, Matrix
-from hilbert.helpers import poittier
 from hilbert.hnf import hnf_row
 from hilbert.vector_types import BasisElement
+from operator import methodcaller
+from orderedset import OrderedSet
+
+def critical_pairs(f, G):
+    # Generators automatically use parallel for loops if available
+    return {s for s in map(f.s_vector, G) if not s.origin }
+
+def poittier(G, j):
+    
+    C = reduce(set.union, (critical_pairs(f, G) for f in G))
+    pprint(C)
+    while len(C):
+        s = min(C,key=methodcaller('norm'))
+        C.remove(s)
+        pprint(C)
+        print("G, n.els:%d" %len(G)) 
+        pprint(G)
+        print("\nC, n.els:%d" %len(C)) 
+        pprint(C)
+        
+        f = s.normal_form(G)
+        if not f.origin:
+            G.add(f)
+            C |= critical_pairs(f, G)
+
+    return G
 
 
 def construct_generating_set(A, VectorClass=BasisElement):
     # input - sympy cone in row echelon form
     # pick first generator    
     # A = matrix
-    h_1 = VectorClass(Matrix([A[0, 0]]))
-    H = [h_1]
+    h_1 = VectorClass([A[0, 0]])
+    H = {h_1}
     s, n = A.shape
     print("A")
     pprint(A)
     # pprint(BC)
     
     for j in range(1, n):
-        
-        # pick H^+
-        H = [h for h in H if h[-1] >= 0]
-
-        F = []
+        F = set()
         # project to first j+1 coordinates
         K = A.T[:j+1, :j+1]
         if j < s:
             for h in H:
-                F.append(h.lift(K))
+                F.add(h.lift(K))
 
-            F.append(VectorClass(K[:,-1]))
-            F.append(VectorClass(-1*K[:,-1]))
+            F.add(VectorClass(K[:,-1]))
+            F.add(VectorClass(-1*K[:,-1]))
         else:
             for h in H:
-                F.append(h.lift(K))
+                F.add(h.lift(K))
         H = poittier(F, j)
+        # pick H^+
+        H -= set(filter(lambda x: x[-1] < 0, H))
         pprint(H)
 
     return H

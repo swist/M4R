@@ -1,26 +1,29 @@
-from sympy import ImmutableMatrix, pprint, eye, gcd
+from sympy import ImmutableMatrix, pprint, eye, gcd, Matrix
 from hilbert.bases_computation import construct_generating_set
 from hilbert.hnf import hnf_row, hnf_col
-from hilbert.fm import fourierMotzkin
 from hilbert.vector_types import ExtremeRay, BasisElement
 
 
 def preimage(matrix, vectors, VectorClass):
     nullspaces = [(-1 * v).row_join(matrix).nullspace() for v in vectors]
     
-    nullspaces = [convert_to_ZZ(ns[0]) for ns in nullspaces]
+    nullspaces = [to_postive_halfspace(ns[0]) for ns in nullspaces]
     vectors = [VectorClass(ns[1:matrix.cols+1]) for ns in nullspaces]
     pprint(vectors)
-    return vectors
+    return set(map(convert_to_ZZ, vectors))
 
-
-def convert_to_ZZ(vector):
-    for i in range(len(vector)):
-        if(vector[i].is_Rational):
-            vector = vector[i].q * vector
+def to_postive_halfspace(vector):
     # make sure 1 in the first position
     if vector[0] < 0:
         vector = vector * abs(vector[0])/vector[0]
+    return vector
+
+def convert_to_ZZ(vector):
+    pprint(vector)
+    for i in range(len(vector)):
+        if(vector[i].is_Rational):
+            vector = vector[i].q * vector
+    pprint(vector)
     return vector
 
 
@@ -36,48 +39,37 @@ class Cone(ImmutableMatrix):
     @property
     def rays(self):
         if self._rays is None:
-            pprint([gcd(*self.col(i)) for i in range(self.cols)])
-            self._rays = [ExtremeRay(self.col(i)) for i in range(self.cols)]
+            self._rays = {ExtremeRay([self.col(i)]) for i in range(self.cols)}
         return self._rays
 
-    def is_dual_ray(self, dual_ray):
-        rays = self.rays
-        return any([dual_ray.dot(ray) == 0 for ray in rays])
-
-    def to_hnf(self):
-        return hnf_row(self)[0]
-
-    def _compute_dual(self):
+    @property 
+    def dual(self):
         if self._dual is None:
-            # pprint(self)
-            # dual_rays = fourierMotzkin(self)
-
-            A, BC = hnf_row(self)
-            pprint(A)
-            pprint(BC)
-            if self.rows is 2:
-                dr = A.inv() * BC.inv()
-                self._dual = map(convert_to_ZZ, [dr.row(i) for i in range(dr.rows)])
-            else:
-                dual_rays = construct_generating_set(A, ExtremeRay)
-                dual_rays = preimage(self.T, dual_rays, ExtremeRay)
-                pprint(dual_rays)
-                self._dual = dual_rays
-
-
+            rays = self._compute_dual()
+            col_matrix = Matrix.hstack(*[ray.as_mutable() for ray in rays])
+            self._dual = Cone(col_matrix)
+            self._dual._dual = self
         return self._dual
+        
 
+    def _compute_dual(self):        
+        A, BC = self.rref()
+
+        dual_rays = construct_generating_set(Matrix(A), ExtremeRay)
+        dual_rays = preimage(self.T, dual_rays, ExtremeRay)
+
+        return dual_rays
 
     def hilbert_basis(self):
         dual = self._compute_dual()
-        return self.hb_from_dual(d)
+        return self.hb_from_dual(dual)
 
 
     def hb_from_dual(self, dual):
         A, BC = hnf_row(dual.T)
         pprint(A)
         pprint(BC)
-        basis = construct_generating_set(A, BasisElement)
+        basis = construct_generating_set(A)
         print('basis')
         pprint(basis)
         basis = preimage(dual, basis, BasisElement)

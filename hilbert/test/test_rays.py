@@ -1,4 +1,4 @@
-from sympy import pprint, Rational
+from sympy import pprint, Rational, Matrix
 from ..vector_types import ExtremeRay
 from ..cone import Cone
 
@@ -31,7 +31,7 @@ def test_ray_s_vector():
     v = ExtremeRay([[0, -5]])
     w = ExtremeRay([[1, 2]])
 
-    s = v.compute_s_vector(w)
+    s = v.s_vector(w)
     # always 0 in the last place
     assert s[-1] == 0
 
@@ -59,3 +59,20 @@ def test_normal_form():
 
     res = s.normal_form(G)
     assert res == s
+
+
+def test_lift():
+    H = {
+        ExtremeRay([1,1]),
+        ExtremeRay([0,5]),
+    }
+
+    K = Matrix([
+        [1,1,0,0],
+        [0,5,-1,-7],
+        [0,0,2,3]
+        ]).T
+
+    lifted = {h.lift(K[:3,:3]) for h in H}
+    expected = {ExtremeRay([1,1,0]), ExtremeRay([0,5,-1])}
+    assert expected == lifted
