@@ -52,9 +52,10 @@ class Cone(ImmutableMatrix):
         return self._dual
         
 
-    def _compute_dual(self):        
+    def _compute_dual(self):  
+        pprint(self)   
         A, BC = self.rref()
-
+        pprint(A)
         dual_rays = construct_generating_set(Matrix(A), ExtremeRay)
         dual_rays = preimage(self.T, dual_rays, ExtremeRay)
 
@@ -73,6 +74,7 @@ class Cone(ImmutableMatrix):
         print('basis')
         pprint(basis)
         basis = preimage(dual, basis, BasisElement)
+        pprint(basis)
         return basis
 
    

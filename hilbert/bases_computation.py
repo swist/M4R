@@ -15,16 +15,11 @@ def poittier(G, j):
     while len(C):
         s = min(C,key=methodcaller('norm'))
         C.remove(s)
-        pprint(C)
-        print("G, n.els:%d" %len(G)) 
-        pprint(G)
-        print("\nC, n.els:%d" %len(C)) 
-        pprint(C)
         
-        f = s.normal_form(G)
-        if not f.origin:
-            G.add(f)
-            C |= critical_pairs(f, G)
+        
+        if s.irreducible(G):
+            G.add(s)
+            C |= critical_pairs(s, G)
 
     return G
 
@@ -32,13 +27,11 @@ def poittier(G, j):
 def construct_generating_set(A, VectorClass=BasisElement):
     # input - sympy cone in row echelon form
     # pick first generator    
-    # A = matrix
+    
     h_1 = VectorClass([A[0, 0]])
     H = {h_1}
     s, n = A.shape
-    print("A")
-    pprint(A)
-    # pprint(BC)
+    
     
     for j in range(1, n):
         F = set()

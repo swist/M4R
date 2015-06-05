@@ -19,6 +19,10 @@ class BaseVector(ImmutableMatrix):
     def origin(self):
         return self.as_mutable().is_zero
 
+    def irreducible(self, G):
+        return not any(g <= self for g in G)
+
+
 class BasisElement(BaseVector):
     """docstring for BasisElement"""
     def __init__(self, *args, **kwargs):
@@ -38,11 +42,11 @@ class BasisElement(BaseVector):
         else:
             return BasisElement([0])
 
-    def compute_alpha(self, vector_g):
-        return min(
-            [floor(s_i/g_i) for s_i, g_i
-                in zip(self[:], vector_g[:]) if g_i != 0]
-        )
+    # def compute_alpha(self, vector_g):
+    #     return min(
+    #         [floor(s_i/g_i) for s_i, g_i
+    #             in zip(self[:], vector_g[:]) if g_i != 0]
+    #     )
 
     def lift(self, M):
         if M.rows == M.cols:
@@ -60,12 +64,6 @@ class BasisElement(BaseVector):
 
     def norm(self):
         return super(BasisElement, self).norm(1)
-
-
-    def normal_form(self, G):
-        if any([g <= self for g in G]):
-            return BasisElement([0])
-        return self
 
 
 class ExtremeRay(BaseVector):
@@ -97,27 +95,12 @@ class ExtremeRay(BaseVector):
     def s_vector(self, other):
         if self[-1]*other[-1] < 0:
             z = self - (self[-1]/other[-1])*other
-            assert z[-1] == 0
             return z
         else:
             return ExtremeRay([0])
 
-    def compute_alpha(self, vector_g):
-        alpha = min([
-            s_i/g_i for s_i, g_i in
-            zip(self[0:-1], vector_g[0:-1]) if g_i != 0])
-        assert alpha != 0
-        return alpha
-
-    def normal_form(self, G):
-        s = self
-        print 'normal form extreme ray'
-        pprint(G)
-        pprint(s)
-        while any(v <= s for v in G):
-            g = next(v for v in G if v <= s)
-            print(g, s)
-            alpha = s.compute_alpha(g)
-            s = s - alpha * g
-            pprint(s)
-        return s
+    # def compute_alpha(self, vector_g):
+    #     alpha = min([
+    #         s_i/g_i for s_i, g_i in
+    #         zip(self[0:-1], vector_g[0:-1]) if g_i != 0])
+    #     return alpha

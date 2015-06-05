@@ -149,7 +149,7 @@ def test_rank_gt_1():
     C = Cone(dual_in)
     res_bas = C.hb_from_dual(dual_in)
 
-    res_exp = [
+    res_exp = {
         BasisElement([1, 1, 0]),
         BasisElement([0, 1, 0]),
         BasisElement([0, 0, 1]),
@@ -159,7 +159,7 @@ def test_rank_gt_1():
         BasisElement([1, 0, 2]),
         BasisElement([1, -2, 5]),
         BasisElement([1, -1, 4])
-    ]
+    }
     assert len(res_exp) == len(res_bas)
     assert res_exp == res_bas
 
@@ -202,7 +202,7 @@ def test_dual3d4():
         ExtremeRay([5, 2, 0])
     }
     assert dual == dual_rays
-
+    assert False
 
 def test_dual3d3():
     C = Cone([

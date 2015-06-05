@@ -48,19 +48,6 @@ def test_ray_alpha():
     assert s.compute_alpha(g) == Rational(132, 13)
 
 
-def test_normal_form():
-    G = [
-        ExtremeRay([1, -1]),
-        ExtremeRay([0, 3]),
-        ExtremeRay([0, -3])
-    ]
-
-    s = ExtremeRay([1, 0])
-
-    res = s.normal_form(G)
-    assert res == s
-
-
 def test_lift():
     H = {
         ExtremeRay([1,1]),
