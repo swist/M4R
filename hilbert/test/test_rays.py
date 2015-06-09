@@ -35,19 +35,6 @@ def test_ray_s_vector():
     # always 0 in the last place
     assert s[-1] == 0
 
-
-def test_ray_alpha():
-    g = ExtremeRay([[1, 5, 132]])
-    s = ExtremeRay([[1, 3, 13]])
-
-    assert s.compute_alpha(g) == Rational(3, 5)
-
-    s = ExtremeRay([[1, 0]])
-    g = ExtremeRay([[Rational(13, 132), 1]])
-
-    assert s.compute_alpha(g) == Rational(132, 13)
-
-
 def test_lift():
     H = {
         ExtremeRay([1,1]),

@@ -4,21 +4,21 @@ from sympy import Matrix, pprint
 from ..vector_types import BasisElement, ExtremeRay
 
 
-def test_hb_from_dual2D():
+def test__hb_from_dual2D():
     # symmetric 2D cone
     dual_in = Matrix([
         [2, -1],
         [-1, 2]
     ])
 
-    C = Cone(dual_in)
+    C = Cone()
 
     res_exp = {
         BasisElement([1,2]),
         BasisElement([2,1]),
         BasisElement([1,1])
     }
-    res_bas = C.hb_from_dual(dual_in)
+    res_bas = C._hb_from_dual(dual_in)
     assert len(res_exp) == len(res_bas)
     assert res_exp == res_bas
 
@@ -28,7 +28,7 @@ def test_hb_from_dual2D():
     ])
 
     # another 2D cone with elts in negative orthant
-    C = Cone(dual_in)
+    C = Cone()
 
     res_exp = {
         BasisElement([1,-3]),
@@ -38,7 +38,7 @@ def test_hb_from_dual2D():
         BasisElement([1,1]),
         BasisElement([1,2])
     }
-    res_bas = C.hb_from_dual(dual_in)
+    res_bas = C._hb_from_dual(dual_in)
     
     assert len(res_exp) == len(res_bas)
     assert res_exp == res_bas
@@ -48,9 +48,9 @@ def test_hb_from_dual2D():
         [1, 0], 
         [0, 1]
     ])
-    C = Cone(dual_in)
+    C = Cone()
 
-    res_bas = C.hb_from_dual(dual_in)   
+    res_bas = C._hb_from_dual(dual_in)   
 
     res_exp = {
         BasisElement([1, 0]),
@@ -103,26 +103,19 @@ def test_hilbert_basis_big():
         BasisElement([ 0, 0, -1, 0, 0,  0,  0,  0,  0]),
         BasisElement([-1, 0,  0, 0, 0,  0,  0,  0,  0])
     }
-    res_bas = C.hb_from_dual(dual_in)
+    res_bas = C._hb_from_dual(dual_in)
     assert len(res_exp) == len(res_bas)
     assert res_exp == res_bas
 
 def test_hilbert_basis_3d3():
-    C = Cone([
-        [1, 1, 0],
-        [0, 3, 0],
-        [0, 0, 1],
-        [2, -5, 11]
-    ])
-
     dual_in = Matrix([
         [1,  0, 0],
         [0,  0, 1],
         [-11, 11, 7],
         [5,  2, 0]
     ])
-
-    res_bas = C.hb_from_dual(dual_in)
+    C = Cone()
+    res_bas = C._hb_from_dual(dual_in)
     
     res_exp = {
         BasisElement([1,  1,  0]),
@@ -146,8 +139,8 @@ def test_rank_gt_1():
         [-11, 11, 7], 
         [5, 2, 0]
     ])
-    C = Cone(dual_in)
-    res_bas = C.hb_from_dual(dual_in)
+    C = Cone()
+    res_bas = C._hb_from_dual(dual_in)
 
     res_exp = {
         BasisElement([1, 1, 0]),
@@ -182,7 +175,6 @@ def test_dual_2d():
     }
     assert dual == dual_rays
 
-
 def test_dual3d4():
     M = Matrix([
         [1, 1, 0],
@@ -202,7 +194,7 @@ def test_dual3d4():
         ExtremeRay([5, 2, 0])
     }
     assert dual == dual_rays
-    assert False
+
 
 def test_dual3d3():
     C = Cone([
@@ -219,7 +211,6 @@ def test_dual3d3():
     print('dual')
     pprint(dual)
     assert dual == dual_rays
-
 
 def test_dual_big():
     C = Cone(Matrix([
@@ -251,7 +242,6 @@ def test_dual_big():
     }
     assert dual == dual_rays
 
-
 def test_dual_3d():
     m_in = Matrix([[1,2,0],[1,-3,0],[0,1,2],[0,7,3]])
     C= Cone(m_in.T)
@@ -267,14 +257,14 @@ def test_dual_3d():
 
 
 def test_dual_3d_lt1():
-    dual_in = Matrix([
+    mat = Matrix([
         [13, 0, 1], 
         [23, 1, 0], 
         [0, 0, 1], 
         [-11, 11, 7], 
         [5, 2, 0]
     ]).T
-    C = Cone(dual_in)
+    C = Cone(mat)
     dual = C._compute_dual()
 
     dual_rays = {
@@ -289,6 +279,11 @@ def test_dual_3d_lt1():
 
 def test_dual_constructor():
     f = Cone([[1,1],[2,-3]])
-
-    assert f.dual.rays == {ExtremeRay([2,-1]), ExtremeRay([3,1])}
+    pprint(f.dual)
+    pprint(f.dual.dual)
+    assert f.dual.dual == f
     assert type(f.dual) is Cone
+
+    
+
+

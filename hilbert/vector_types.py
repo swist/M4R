@@ -8,19 +8,9 @@ class BaseVector(ImmutableMatrix):
     def __init__(self, *args, **kwargs):
         super(BaseVector, self).__init__(*args, **kwargs)
 
-    def __getitem__(self, key):
-        from_super_class = super(BaseVector, self).__getitem__(key)
-        if(isinstance(key, slice)):
-            if key.start or key.stop:
-                return self.__class__(from_super_class)
-        return from_super_class
-
     @property
     def origin(self):
         return self.as_mutable().is_zero
-
-    def irreducible(self, G):
-        return not any(g <= self for g in G)
 
 
 class BasisElement(BaseVector):
@@ -33,20 +23,14 @@ class BasisElement(BaseVector):
             [u_i <= v_i for u_i, v_i in itertools.izip(self[:-1], other[:-1])]
             ) and abs(self[-1]) <= abs(other[-1]) and self[-1]*other[-1] >= 0
 
-    def __ge__(self, other):
-        return other.__le__(self)
+    def norm(self):
+        return super(BasisElement, self).norm(1)
 
     def s_vector(self, other):
         if self[-1]*other[-1] < 0:
             return self + other
         else:
             return BasisElement([0])
-
-    # def compute_alpha(self, vector_g):
-    #     return min(
-    #         [floor(s_i/g_i) for s_i, g_i
-    #             in zip(self[:], vector_g[:]) if g_i != 0]
-    #     )
 
     def lift(self, M):
         if M.rows == M.cols:
@@ -61,9 +45,6 @@ class BasisElement(BaseVector):
                 i = i + 1
         else:
             return M * M[:M.cols,:M.cols].solve(self[:M.cols,:M.cols])            
-
-    def norm(self):
-        return super(BasisElement, self).norm(1)
 
 
 class ExtremeRay(BaseVector):
@@ -89,18 +70,12 @@ class ExtremeRay(BaseVector):
 
         else:
             return M * M[:M.cols,:M.cols].solve(self[:M.cols,:M.cols])  
+    
     def norm(self):
         return len(self.support)
 
     def s_vector(self, other):
         if self[-1]*other[-1] < 0:
-            z = self - (self[-1]/other[-1])*other
-            return z
+            return self - (self[-1]/other[-1])*other
         else:
             return ExtremeRay([0])
-
-    # def compute_alpha(self, vector_g):
-    #     alpha = min([
-    #         s_i/g_i for s_i, g_i in
-    #         zip(self[0:-1], vector_g[0:-1]) if g_i != 0])
-    #     return alpha

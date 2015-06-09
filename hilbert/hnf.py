@@ -53,25 +53,6 @@ def hnf_col(A):
     return B, BC
 
 
-def col_one_gcd(A, i, j, l):
-    assert i < A.cols
-    assert j < l < A.rows
-    if A[j, i] != 0 or A[l, i] != 0:
-        u, v, d = igcdex(A[j, i], A[l, i])
-        print("col_one_gcd")
-        print(u, v, d)
-
-        reduced = Matrix([
-            [u, v],
-            [-A[l, i]/d, A[j, i]/d]
-        ])
-        s = reduced * A.extract([j, l], range(A.cols))
-        # pprint(s)
-        A[j, :] = s[0, :]
-        A[l, :] = s[1, :]
-    return A
-
-
 def hnf_row(A):
     B, BC = hnf_col(A.T)
 

@@ -5,7 +5,7 @@ def test_basis_leq():
     g = BasisElement([[1, 13]])
     s = BasisElement([[1, 13]])
 
-    assert g[:2] <= s[:2]
+    assert g <= s
     s = BasisElement([[1, 14]])
 
     assert g[:2] <= s[:2]
@@ -15,7 +15,7 @@ def test_basis_leq():
 
     g = BasisElement([[0, 1, 13]])
     s = BasisElement([[1, 0, 3]])
-    assert not (g[:3] <= s[:3])
+    assert not g <= s
 
 def test_addition():
     g = BasisElement([[1, 13]])
