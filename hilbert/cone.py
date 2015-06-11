@@ -24,14 +24,13 @@ class Cone(ImmutableMatrix):
         if self._dual is None:
             rays = self._compute_dual()
             col_matrix = Matrix.hstack(*[ray.as_mutable() for ray in rays])
-            self._dual = Cone(col_matrix.T)
+            self._dual = Cone(col_matrix)
         return self._dual
         
 
     def _compute_dual(self):  
-        pprint(self)   
         A, BC = self.rref()
-        pprint(A)
+
         dual_rays = construct_generating_set(Matrix(A), ExtremeRay)
         dual_rays = preimage(self.T, dual_rays, ExtremeRay)
 
@@ -39,18 +38,13 @@ class Cone(ImmutableMatrix):
 
     def hilbert_basis(self):
         dual = self.dual
-        return self._hb_from_dual(dual)
+        return self._hb_from_dual(dual.T)
 
 
     def _hb_from_dual(self, dual):
         A, BC = hnf_row(dual.T)
-        pprint(A)
-        pprint(BC)
         basis = construct_generating_set(A)
-        print('basis')
-        pprint(basis)
-        basis = preimage(dual, basis, BasisElement)
-        pprint(basis)
-        return basis
+
+        return preimage(dual, basis, BasisElement)
 
    

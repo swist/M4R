@@ -14,3 +14,13 @@ writeup/writeup.pdf
 writeup/writeup.toc
 writeup/thesis.preamble.aux
 writeup/mathsymbols.sty
+hilbert/hnf.log
+writeup/_minted-writeup/
+writeup/figures/
+*.log
+*.bcf
+*.blg
+*.out 
+*.pyg 
+*.xml 
+*.gz

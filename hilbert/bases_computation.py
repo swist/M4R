@@ -10,7 +10,7 @@ def preimage(matrix, vectors, VectorClass):
     
     nullspaces = [to_postive_halfspace(ns[0]) for ns in nullspaces]
     vectors = [VectorClass(ns[1:matrix.cols+1]) for ns in nullspaces]
-    pprint(vectors)
+    
     return set(map(convert_to_ZZ, vectors))
 
 def to_postive_halfspace(vector):
@@ -20,11 +20,11 @@ def to_postive_halfspace(vector):
     return vector
 
 def convert_to_ZZ(vector):
-    pprint(vector)
+    
     for i in range(len(vector)):
         if(vector[i].is_Rational):
             vector = vector[i].q * vector
-    pprint(vector)
+    
     return vector
 
 def critical_pairs(s, G):
@@ -36,7 +36,7 @@ def is_irreducible(s, G):
 def construct_generating_set(A, VectorClass=BasisElement):
     H = {VectorClass([A[0, 0]])}
     s, n = A.shape
-    
+
     for j in range(1, n):
         K = A.T[:j+1, :j+1]
         F = set()
@@ -46,30 +46,22 @@ def construct_generating_set(A, VectorClass=BasisElement):
         for h in H:
             F.add(h.lift(K))
                 
-        pprint(F)
         H = cpc(F)
         # pick H^+
         H -= set(filter(lambda x: x[-1] < 0, H))
-        pprint(H)
 
     return H
 
 def cpc(G):
-    
     C = reduce(set.union, (critical_pairs(f, G) for f in G))
-    # pprint(C)
+
     while len(C):
-        # pprint(C)
+
         s = min(C,key=methodcaller('norm'))
         C.remove(s)
-        # print('s_vector')
-        # pprint(s)
-        # print("G before")
-        # pprint(G)
+
         if is_irreducible(s, G):
             G.add(s)
             C |= critical_pairs(s, G)
-        # print("G after")
-        # pprint(G)
 
     return G

@@ -107,6 +107,29 @@ def test_hilbert_basis_big():
     assert len(res_exp) == len(res_bas)
     assert res_exp == res_bas
 
+def test_hilbert_basis_3all():
+    rays = Matrix([
+        [2,  -5, 11],
+        [0,  1, 0],
+        [1,  1, 0],
+        [0,  0, 1]
+    ])
+    C = Cone(rays.T)
+    res_bas = C.hilbert_basis()
+    
+    res_exp = {
+        BasisElement([1,  1,  0]),
+        BasisElement([0,  1,  0]),
+        BasisElement([0,  0,  1]),
+        BasisElement([2, -5, 11]),
+        BasisElement([1,  0,  2]),
+        BasisElement([1, -2,  5]),
+        BasisElement([2, -3,  8]),
+        BasisElement([1, -1,  4])
+    }
+    assert len(res_exp) == len(res_bas)
+    assert res_exp == res_bas
+
 def test_hilbert_basis_3d3():
     dual_in = Matrix([
         [1,  0, 0],
@@ -195,7 +218,6 @@ def test_dual3d4():
     }
     assert dual == dual_rays
 
-
 def test_dual3d3():
     C = Cone([
         [1, 0, 0],
@@ -278,10 +300,10 @@ def test_dual_3d_lt1():
 
 
 def test_dual_constructor():
-    f = Cone([[1,1],[2,-3]])
-    pprint(f.dual)
-    pprint(f.dual.dual)
-    assert f.dual.dual == f
+    f = Cone([[1,2],[2,-3]])    
+
+
+    assert f.dual.dual.rays == f.rays
     assert type(f.dual) is Cone
 
     
