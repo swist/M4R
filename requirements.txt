@@ -1,0 +1,5 @@
+orderedset==1.1.2
+py==1.4.28
+pytest==2.7.1
+sympy==0.7.6
+wheel==0.24.0
